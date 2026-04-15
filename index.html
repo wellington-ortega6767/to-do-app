@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-Do List Premium</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #1a0000;
+  --card: #2a0005;
+  --primary: #c0000a;
+  --accent: #e84040;
+  --light: #fff0f0;
+  --muted: #a66;
+  --border: #4a0000;
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background: radial-gradient(circle at top, #2a0005, #1a0000);
+  color:var(--light);
+  min-height:100vh;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+}
+
+/* HEADER */
+header{
+  padding:30px 60px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+h1{
+  font-family:'Playfair Display';
+  font-size:3.5rem;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+h1 span{color:var(--accent);}
+
+.sub{
+  font-size:0.8rem;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+/* MAIN */
+main{
+  display:grid;
+  grid-template-columns:380px 1fr;
+}
+
+/* FORM CARD */
+.form{
+  padding:40px 30px;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.form h2{
+  font-family:'Playfair Display';
+  font-size:1.4rem;
+}
+
+input, select{
+  padding:12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#1a0000;
+  color:white;
+}
+
+input:focus, select:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(232,64,64,0.2);
+}
+
+button{
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover{
+  background:#a00008;
+  transform:translateY(-1px);
+}
+
+/* LISTA */
+.lista{
+  padding:40px;
+}
+
+.lista-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.lista h2{
+  font-family:'Playfair Display';
+}
+
+.badge-count{
+  background:rgba(255,0,0,0.1);
+  padding:5px 12px;
+  border-radius:999px;
+  font-size:0.8rem;
+  color:var(--accent);
+}
+
+/* ITEM */
+ul{list-style:none;}
+
+li{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-left:4px solid var(--accent);
+  padding:15px 18px;
+  margin-bottom:10px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  transition:0.2s;
+}
+
+li:hover{
+  transform:translateX(4px);
+  background:#330007;
+}
+
+.texto{
+  flex:1;
+}
+
+.concluida{
+  text-decoration:line-through;
+  opacity:0.5;
+}
+
+/* PRIORIDADES */
+.alta{border-left-color:#ff4d4d;}
+.media{border-left-color:#fbbf24;}
+.baixa{border-left-color:#f472b6;}
+
+.tag{
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:999px;
+  text-transform:uppercase;
+}
+
+.tag.alta{background:rgba(255,77,77,0.15); color:#ff6b6b;}
+.tag.media{background:rgba(251,191,36,0.15); color:#fbbf24;}
+.tag.baixa{background:rgba(244,114,182,0.15); color:#f472b6;}
+
+.remove{
+  cursor:pointer;
+  opacity:0.6;
+  transition:0.2s;
+}
+
+.remove:hover{
+  opacity:1;
+  color:#ff6b6b;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  margin-top:60px;
+  color:var(--muted);
+}
+
+/* FOOTER */
+footer{
+  padding:15px 60px;
+  border-top:1px solid var(--border);
+  font-size:0.8rem;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>To-Do <span>List</span></h1>
+  <div class="sub">Engenharia de Prompt</div>
+</header>
+
+<main>
+
+<div class="form">
+  <h2>Nova tarefa</h2>
+
+  <input id="tarefa" placeholder="Digite sua tarefa">
+
+  <select id="prioridade">
+    <option value="">Prioridade</option>
+    <option value="alta">Alta</option>
+    <option value="media">Média</option>
+    <option value="baixa">Baixa</option>
+  </select>
+
+  <button onclick="addTask()">Adicionar tarefa</button>
+</div>
+
+<div class="lista">
+  <div class="lista-header">
+    <h2>Tarefas</h2>
+    <span class="badge-count" id="contador">0</span>
+  </div>
+
+  <ul id="lista"></ul>
+  <div id="empty" class="empty">Nenhuma tarefa ainda</div>
+</div>
+
+</main>
+
+<footer>
+Projeto acadêmico — To-Do List com IA
+</footer>
+
+<script>
+let count = 0;
+
+function update(){
+  document.getElementById("contador").innerText = count;
+  document.getElementById("empty").style.display = count ? "none" : "block";
+}
+
+function addTask(){
+  const text = document.getElementById("tarefa").value.trim();
+  const priority = document.getElementById("prioridade").value;
+
+  if(!text || !priority) return;
+
+  const li = document.createElement("li");
+  li.classList.add(priority);
+
+  const check = document.createElement("input");
+  check.type = "checkbox";
+
+  const span = document.createElement("span");
+  span.className = "texto";
+  span.innerText = text;
+
+  check.onchange = () => span.classList.toggle("concluida");
+
+  const tag = document.createElement("span");
+  tag.className = "tag " + priority;
+  tag.innerText = priority;
+
+  const remove = document.createElement("span");
+  remove.className = "remove";
+  remove.innerText = "✕";
+
+  remove.onclick = () => {
+    li.remove();
+    count--;
+    update();
+  };
+
+  li.append(check, span, tag, remove);
+  document.getElementById("lista").appendChild(li);
+
+  count++;
+  update();
+
+  document.getElementById("tarefa").value = "";
+}
+
+update();
+</script>
+
+</body>
+</html>
